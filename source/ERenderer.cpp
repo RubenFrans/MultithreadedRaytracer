@@ -76,8 +76,6 @@ void Elite::Renderer::Render(float totalTime,float deltaT)
 	HandleInput(deltaT);
 	UpdateScene(totalTime, deltaT);
 
-	//m_JobSystem.Schedule([]() { std::cout << "JobSystem is working" << std::endl; });
-
 	if (m_EndableMultithreadedRendering)
 		ScheduleRenderJobs();
 	else
