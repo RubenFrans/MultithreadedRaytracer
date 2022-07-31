@@ -47,8 +47,8 @@ Elite::Renderer::Renderer(SDL_Window* pWindow)
 	m_Camera->UpdateSceneGraphReference();
 
 	m_AmountOfCores = std::thread::hardware_concurrency();
-	m_RenderBatchRowAmount = m_Height / m_AmountOfCores;
-	m_RenderRowstep = m_RenderBatchRowAmount * m_AmountOfCores;
+	m_RenderBatchRowAmount = m_Height / m_JobSystem.GetAmountOfWorkerThreads();
+	m_RenderRowstep = m_RenderBatchRowAmount * m_JobSystem.GetAmountOfWorkerThreads();
 
 	m_EndableMultithreadedRendering = true;
 	PrintControlInfo();
@@ -75,8 +75,10 @@ void Elite::Renderer::Render(float totalTime,float deltaT)
 	HandleInput(deltaT);
 	UpdateScene(totalTime, deltaT);
 
+	//m_JobSystem.Schedule([]() { std::cout << "JobSystem is working" << std::endl; });
+
 	if (m_EndableMultithreadedRendering)
-		MultiThreadedRendering();
+		ScheduleRenderJobs();
 	else
 		SingleThreadedRendering();
 
@@ -90,6 +92,42 @@ bool Elite::Renderer::SaveBackbufferToImage() const
 	return SDL_SaveBMP(m_pBackBuffer, "BackbufferRender.bmp");
 }
 
+
+void Elite::Renderer::ScheduleRenderJobs() {
+
+	std::vector<SJSL::Job*> renderJobs{};
+
+	for (uint32_t r = 0; r < m_Height; r += m_RenderRowstep)
+	{
+		for (int i = 0; i < m_JobSystem.GetAmountOfWorkerThreads(); i++)
+		{
+
+			renderJobs.push_back(new SJSL::Job{ std::bind(&Camera::CalculatePixelBatch, m_Camera, 0
+				, r + m_RenderBatchRowAmount * i, m_RenderBatchRowAmount
+				, m_Width, m_Height, m_pBackBufferPixels, m_pBackBuffer), false });
+
+		}
+	}
+
+	for (SJSL::Job* job : renderJobs) {
+
+		m_JobSystem.Schedule(job);
+	}
+
+	for (SJSL::Job* job : renderJobs) {
+
+		job->Join();
+	}
+
+	for (SJSL::Job* job : renderJobs) {
+
+		delete job;
+	}
+}
+
+/*
+* DEPRECATED THREADED RENDERING (makes new threads every frame!!!)
+*/
 void Elite::Renderer::MultiThreadedRendering()
 {
 	for (uint32_t r = 0; r < m_Height; r += m_RenderRowstep)

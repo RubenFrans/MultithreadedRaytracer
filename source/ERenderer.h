@@ -11,6 +11,7 @@
 #include <cstdint>
 #include <vector>
 #include "Geometry.h"
+#include "JobSystem.h"
 
 
 struct SDL_Window;
@@ -35,8 +36,9 @@ namespace Elite
 
 		void Render(float totalTime, float deltaT);
 		bool SaveBackbufferToImage() const;
-		void MultiThreadedRendering();
+		void MultiThreadedRendering(); // Deprecated threaded rendering
 		void SingleThreadedRendering();
+		void ScheduleRenderJobs();
 
 	private:
 		SDL_Window* m_pWindow = nullptr;
@@ -61,6 +63,7 @@ namespace Elite
 		void InitializeBunnyScene();
 		void InitializeSphereScene();
 		void PrintControlInfo();
+		SJSL::JobSystem m_JobSystem{};
 	};
 }
 

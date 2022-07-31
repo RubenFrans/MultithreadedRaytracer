@@ -11,7 +11,7 @@
       <AdditionalIncludeDirectories>../include/vld;../include/sdl2-2.0.9;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>../lib/vld/x64;../lib/sdl2-2.0.9/x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../lib/vld/x64;../lib/sdl2-2.0.9/x64;../lib/SJSL/x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>SDL2.lib;SDL2main.lib;vld.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>

@@ -55,7 +55,7 @@ void Camera::CalculatePixelColor(int c, int r, int width, int height, HitRecord&
 
 void Camera::CalculatePixelBatch(int c_in, int r_in, int amountOfRows, int width, int height, uint32_t* backBufferPixels, SDL_Surface* surface) {
 
-
+	//std::cout << "Calculating batch" << std::endl;
 	for (int r = r_in; r < r_in + amountOfRows; r++)
 	{
 		for (int c = c_in; c < width; c++)

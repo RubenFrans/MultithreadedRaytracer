@@ -45,10 +45,12 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>C:\Users\Ruben Frans\Documents\school\howest\GD2\Perforce_Workspace\2021-2022\Students\rfrans\2DAE06E_Frans_Ruben_Raytracer\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\School\Howest\Portfolio\MTRaytracer\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\School\Howest\Portfolio\MTRaytracer\lib;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LibraryPath>C:\Users\Ruben Frans\Documents\school\howest\GD2\Perforce_Workspace\2021-2022\Students\rfrans\2DAE06E_Frans_Ruben_Raytracer\include;C:\Users\Ruben Frans\Documents\school\howest\GD2\Perforce_Workspace\2021-2022\Students\rfrans\2DAE06E_Frans_Ruben_Raytracer\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\School\Howest\Portfolio\MTRaytracer\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -56,9 +58,11 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>../include/SJSL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
+      <AdditionalDependencies>SJSLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -69,11 +73,13 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>../include/SJSL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>SJSLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
