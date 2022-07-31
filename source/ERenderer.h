@@ -64,6 +64,7 @@ namespace Elite
 		void InitializeSphereScene();
 		void PrintControlInfo();
 		SJSL::JobSystem m_JobSystem{};
+		std::vector<SJSL::Job*> m_RenderJobs;
 	};
 }
 

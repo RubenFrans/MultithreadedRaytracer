@@ -46,11 +46,12 @@ Elite::Renderer::Renderer(SDL_Window* pWindow)
 	m_Camera = new Camera(Elite::FVector3{0.0f, 3.f, 9.f}, 1.f, 45);
 	m_Camera->UpdateSceneGraphReference();
 
-	m_AmountOfCores = std::thread::hardware_concurrency();
-	m_RenderBatchRowAmount = m_Height / m_JobSystem.GetAmountOfWorkerThreads();
-	m_RenderRowstep = m_RenderBatchRowAmount * m_JobSystem.GetAmountOfWorkerThreads();
+	m_AmountOfCores = m_JobSystem.GetAmountOfWorkerThreads();
+	m_RenderBatchRowAmount = m_Height / m_AmountOfCores;
+	m_RenderRowstep = m_RenderBatchRowAmount * m_AmountOfCores;
 
 	m_EndableMultithreadedRendering = true;
+	m_RenderJobs;
 	PrintControlInfo();
 }
 
@@ -92,37 +93,37 @@ bool Elite::Renderer::SaveBackbufferToImage() const
 	return SDL_SaveBMP(m_pBackBuffer, "BackbufferRender.bmp");
 }
 
-
 void Elite::Renderer::ScheduleRenderJobs() {
 
-	std::vector<SJSL::Job*> renderJobs{};
 
 	for (uint32_t r = 0; r < m_Height; r += m_RenderRowstep)
 	{
-		for (int i = 0; i < m_JobSystem.GetAmountOfWorkerThreads(); i++)
+		for (int i = 0; i < m_AmountOfCores; i++)
 		{
 
-			renderJobs.push_back(new SJSL::Job{ std::bind(&Camera::CalculatePixelBatch, m_Camera, 0
+			m_RenderJobs.push_back(new SJSL::Job{ std::bind(&Camera::CalculatePixelBatch, m_Camera, 0
 				, r + m_RenderBatchRowAmount * i, m_RenderBatchRowAmount
 				, m_Width, m_Height, m_pBackBufferPixels, m_pBackBuffer), false });
 
 		}
 	}
 
-	for (SJSL::Job* job : renderJobs) {
+	for (SJSL::Job* job : m_RenderJobs) {
 
 		m_JobSystem.Schedule(job);
 	}
 
-	for (SJSL::Job* job : renderJobs) {
+	for (SJSL::Job* job : m_RenderJobs) {
 
 		job->Join();
 	}
 
-	for (SJSL::Job* job : renderJobs) {
+	for (SJSL::Job* job : m_RenderJobs) {
 
 		delete job;
 	}
+
+	m_RenderJobs.clear();
 }
 
 /*
