@@ -1,3 +1,4 @@
-# MultithreadedRaytracer
-The base of this projects, the software raytracer was a school assignment that I extended from my studies at Howest - Digital Arts & Entertainment.
-When creating the SJSL library (Simple Job System library), I used this project to test the library's functionality as a real world example.
+# Multithreaded Software-Raytracer
+This project is an extention of a school project I made for the Graphics Programming 1 course during my studios at Howest University - Digital Arts & Entertainment.
+
+For the school assignment I made the raytracer itself. But when I was creating SJSL (Simple Job System Library) I extended this project to test my jobsystem to divide the rendering of a frame automatically across different threads.
