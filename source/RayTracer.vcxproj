@@ -46,10 +46,10 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>C:\School\Howest\Portfolio\MTRaytracer\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\School\Howest\Portfolio\MTRaytracer\lib;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
+    <LibraryPath>C:\School\Howest\Portfolio\MTRaytracer\lib\SJSL\x64\$(Configuration);C:\School\Howest\Portfolio\MTRaytracer\lib;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LibraryPath>C:\School\Howest\Portfolio\MTRaytracer\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\School\Howest\Portfolio\MTRaytracer\lib\SJSL\x64\$(Configuration);C:\School\Howest\Portfolio\MTRaytracer\lib;$(LibraryPath)</LibraryPath>
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

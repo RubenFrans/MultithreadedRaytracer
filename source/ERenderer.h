@@ -39,6 +39,7 @@ namespace Elite
 		void MultiThreadedRendering(); // Deprecated threaded rendering
 		void SingleThreadedRendering();
 		void ScheduleRenderJobs();
+		void InitializeRenderJobs();
 
 	private:
 		SDL_Window* m_pWindow = nullptr;
@@ -58,6 +59,7 @@ namespace Elite
 		bool m_SwitchScenekeyPressed;
 		bool m_ToggleShadowsKeyPressed;
 		bool m_ToggleRenderModeKeyPressed;
+		bool m_ToggleMultithreadingKeyPressed;
 		void HandleInput(float deltaT);
 		void UpdateScene(float totalTime, float deltaT);
 		void InitializeBunnyScene();

@@ -51,8 +51,25 @@ Elite::Renderer::Renderer(SDL_Window* pWindow)
 	m_RenderRowstep = m_RenderBatchRowAmount * m_AmountOfCores;
 
 	m_EndableMultithreadedRendering = true;
-	m_RenderJobs;
+	InitializeRenderJobs();
 	PrintControlInfo();
+}
+
+void Elite::Renderer::InitializeRenderJobs() {
+	
+	m_RenderJobs = std::vector<SJSL::Job*>{};
+	
+	for (uint32_t r = 0; r < m_Height; r += m_RenderRowstep)
+	{
+		for (int i = 0; i < m_AmountOfCores; i++)
+		{
+
+			m_RenderJobs.push_back(new SJSL::Job{ std::bind(&Camera::CalculatePixelBatch, m_Camera, 0
+				, r + m_RenderBatchRowAmount * i, m_RenderBatchRowAmount
+				, m_Width, m_Height, m_pBackBufferPixels, m_pBackBuffer) });
+
+		}
+	}
 }
 
 void Elite::Renderer::PrintControlInfo() {
@@ -93,21 +110,8 @@ bool Elite::Renderer::SaveBackbufferToImage() const
 
 void Elite::Renderer::ScheduleRenderJobs() {
 
-
-	for (uint32_t r = 0; r < m_Height; r += m_RenderRowstep)
-	{
-		for (int i = 0; i < m_AmountOfCores; i++)
-		{
-
-			m_RenderJobs.push_back(new SJSL::Job{ std::bind(&Camera::CalculatePixelBatch, m_Camera, 0
-				, r + m_RenderBatchRowAmount * i, m_RenderBatchRowAmount
-				, m_Width, m_Height, m_pBackBufferPixels, m_pBackBuffer), false });
-
-		}
-	}
-
 	for (SJSL::Job* job : m_RenderJobs) {
-
+		job->Reset();
 		m_JobSystem.Schedule(job);
 	}
 
@@ -115,13 +119,6 @@ void Elite::Renderer::ScheduleRenderJobs() {
 
 		job->Join();
 	}
-
-	for (SJSL::Job* job : m_RenderJobs) {
-
-		delete job;
-	}
-
-	m_RenderJobs.clear();
 }
 
 /*
@@ -241,6 +238,26 @@ void Elite::Renderer::HandleInput(float deltaT) {
 		m_ToggleShadowsKeyPressed = false;
 	}
 
+	if (state[SDL_SCANCODE_RETURN]) {
+
+		if (!m_ToggleMultithreadingKeyPressed) {
+			m_EndableMultithreadedRendering = !m_EndableMultithreadedRendering;
+			m_ToggleMultithreadingKeyPressed = true;
+
+			std::cout << "Multithreaded Rendering: ";
+			if (m_EndableMultithreadedRendering) {
+				std::cout << "Enabled" << std::endl;
+			}
+			else {
+				std::cout << "Disabled" << std::endl;
+			}
+
+		}
+	}
+	else {
+		m_ToggleMultithreadingKeyPressed = false;
+	}
+
 	if (state[SDL_SCANCODE_E]) {
 
 		if (!m_ToggleRenderModeKeyPressed) {
@@ -328,6 +345,14 @@ Elite::Renderer::~Renderer()
 		delete m_Scenes[i];
 		m_Scenes[i] = nullptr;
 	}
+
+	// Cleanup render jobs
+	for (SJSL::Job* job : m_RenderJobs) {
+
+		delete job;
+	}
+
+	m_RenderJobs.clear();
 }
 
 void Elite::Renderer::InitializeBunnyScene()

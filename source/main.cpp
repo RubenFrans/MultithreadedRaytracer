@@ -1,7 +1,5 @@
 //External includes
-// vld is disabled because it doesn't work on my system and I have not been able to find a cause, I have had somebody else check my code for memory leaks and all should be clear
-// If vld does work on your system you should be able to uncomment the line below and have leak detection working
-//#include "vld.h"
+#include "vld.h"
 #include "SDL.h"
 #include "SDL_surface.h"
 #undef main
