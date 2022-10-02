@@ -24,15 +24,15 @@ namespace SJSL {
 		JobSystem(uint32_t nrOfWorkerThreads, bool isMainThreadWorker);
 		~JobSystem();
 
-		JobSystem(const JobSystem&) = delete; // Copy constructor
-		JobSystem(JobSystem&&) = delete; // Move constructor
-		JobSystem& operator=(const JobSystem&) = delete; // Copy assignment
-		JobSystem& operator=(const JobSystem&&) = delete; // Move assignment
+		JobSystem(const JobSystem&) = delete;
+		JobSystem(JobSystem&&) = delete;
+		JobSystem& operator=(const JobSystem&) = delete;
+		JobSystem& operator=(const JobSystem&&) = delete;
 
-		void Schedule(const std::function<void()>& work);
-		void Schedule(SJSL::Job* pJob);
+		std::shared_ptr<SJSL::Job> Schedule(const std::function<void()>& work);
+		void Schedule(std::shared_ptr<SJSL::Job>& pJob);
 
-		uint32_t GetAmountOfWorkerThreads();
+		uint32_t GetAmountOfWorkerThreads() const;
 
 	private:
 		void InitializeWorkerThreads();

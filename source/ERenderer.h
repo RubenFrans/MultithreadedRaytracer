@@ -61,12 +61,12 @@ namespace Elite
 		bool m_ToggleRenderModeKeyPressed;
 		bool m_ToggleMultithreadingKeyPressed;
 		void HandleInput(float deltaT);
-		void UpdateScene(float totalTime, float deltaT);
+		void UpdateScene(float totalTime, float dltaT);
 		void InitializeBunnyScene();
 		void InitializeSphereScene();
 		void PrintControlInfo();
 		SJSL::JobSystem m_JobSystem{};
-		std::vector<SJSL::Job*> m_RenderJobs;
+		std::vector<std::shared_ptr<SJSL::Job>> m_RenderJobs;
 	};
 }
 

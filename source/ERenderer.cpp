@@ -56,17 +56,17 @@ Elite::Renderer::Renderer(SDL_Window* pWindow)
 }
 
 void Elite::Renderer::InitializeRenderJobs() {
-	
-	m_RenderJobs = std::vector<SJSL::Job*>{};
+
+	m_RenderJobs = std::vector<std::shared_ptr<SJSL::Job>>{};
 	
 	for (uint32_t r = 0; r < m_Height; r += m_RenderRowstep)
 	{
 		for (int i = 0; i < m_AmountOfCores; i++)
 		{
 
-			m_RenderJobs.push_back(new SJSL::Job{ std::bind(&Camera::CalculatePixelBatch, m_Camera, 0
+			m_RenderJobs.emplace_back(std::make_shared<SJSL::Job>( std::bind(&Camera::CalculatePixelBatch, m_Camera, 0
 				, r + m_RenderBatchRowAmount * i, m_RenderBatchRowAmount
-				, m_Width, m_Height, m_pBackBufferPixels, m_pBackBuffer) });
+				, m_Width, m_Height, m_pBackBufferPixels, m_pBackBuffer) ));
 
 		}
 	}
@@ -98,6 +98,7 @@ void Elite::Renderer::Render(float totalTime,float deltaT)
 	else
 		SingleThreadedRendering();
 
+
 	SDL_UnlockSurface(m_pBackBuffer);
 	SDL_BlitSurface(m_pBackBuffer, 0, m_pFrontBuffer, 0);
 	SDL_UpdateWindowSurface(m_pWindow);
@@ -110,12 +111,12 @@ bool Elite::Renderer::SaveBackbufferToImage() const
 
 void Elite::Renderer::ScheduleRenderJobs() {
 
-	for (SJSL::Job* job : m_RenderJobs) {
+	for (std::shared_ptr<SJSL::Job> job : m_RenderJobs) {
 		job->Reset();
 		m_JobSystem.Schedule(job);
 	}
 
-	for (SJSL::Job* job : m_RenderJobs) {
+	for (std::shared_ptr<SJSL::Job> job : m_RenderJobs) {
 
 		job->Join();
 	}
@@ -346,13 +347,13 @@ Elite::Renderer::~Renderer()
 		m_Scenes[i] = nullptr;
 	}
 
-	// Cleanup render jobs
-	for (SJSL::Job* job : m_RenderJobs) {
+	//// Cleanup render jobs
+	//for (SJSL::Job* job : m_RenderJobs) {
 
-		delete job;
-	}
+	//	delete job;
+	//}
 
-	m_RenderJobs.clear();
+	//m_RenderJobs.clear();
 }
 
 void Elite::Renderer::InitializeBunnyScene()

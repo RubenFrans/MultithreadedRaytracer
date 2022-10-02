@@ -26,7 +26,7 @@ namespace SJSL {
 		pending // Worker has pending jobs but is not currently working on them
 	};
 
-	class WorkerThread
+	class WorkerThread final
 	{
 
 	public:
@@ -39,20 +39,23 @@ namespace SJSL {
 		WorkerThread& operator=(const WorkerThread&) = delete; // Copy assignment
 		WorkerThread& operator=(const WorkerThread&&) = delete; // Move assignment
 
-		void Assign(const std::function<void()>& job, bool isLocalJob = true); // Assign a job to the worker thread
-		void Assign(Job* pJob, bool isLocalJob = true);
+		void Assign(std::shared_ptr<SJSL::Job>& pJob, bool isLocalJob = true);
 		void Join();
 
-		int GetAmountOfLocalJobs();
-		int GetAmountOfGlobalJobs();
+		size_t GetAmountOfLocalJobs() const;
+		size_t GetAmountOfGlobalJobs() const;
 
 	private:
 
 		void ProcessJobs();
+		void ProcessLocalJob();
+		void ProcessGlobalJob();
+		void AssignJobToLocalQueue(std::shared_ptr<SJSL::Job>& pJob);
+		void AssignJobToGlobalQueue(std::shared_ptr<SJSL::Job>& pJob);
 
 		WorkerStatus m_WorkerStatus;
-		std::list<SJSL::Job*> m_LocalJobs; // Other workers CANNOT steal from this list
-		std::list<SJSL::Job*> m_GlobalJobs; // Other workers can steal from this list to improve load ballancing
+		std::list<std::shared_ptr<SJSL::Job>> m_LocalJobs; // Other workers CANNOT steal from this list
+		std::list<std::shared_ptr<SJSL::Job>> m_GlobalJobs; // Other workers can steal from this list to improve load ballancing
 
 		bool m_KillWorkerThread;
 
