@@ -45,12 +45,13 @@ Elite::Renderer::Renderer(SDL_Window* pWindow)
 	
 	m_Camera = new Camera(Elite::FVector3{0.0f, 3.f, 9.f}, 1.f, 45);
 	m_Camera->UpdateSceneGraphReference();
+	m_Camera->PreComputeRays(m_Width, m_Height);
 
 	m_AmountOfCores = m_JobSystem.GetAmountOfWorkerThreads();
 	m_RenderBatchRowAmount = m_Height / m_AmountOfCores;
 	m_RenderRowstep = m_RenderBatchRowAmount * m_AmountOfCores;
 
-	m_EndableMultithreadedRendering = true;
+	m_EndableMultithreadedRendering = false;
 	InitializeRenderJobs();
 	PrintControlInfo();
 }

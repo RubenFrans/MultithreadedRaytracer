@@ -49,6 +49,7 @@ public:
 
 	void ToggleRenderMode();
 	void ToggleShadows();
+	void PreComputeRays(int screenWidth, int screenHeight);
 
 private:
 
@@ -66,12 +67,13 @@ private:
 	RenderMode m_RenderMode;
 	float m_RotateSpeed;
 
+	std::vector<Ray> m_NormalizedRays;
+
 
 	Elite::FVector3 ScreenToWorldSpaceWithCameraOffset(int c, int r, int width, int height) const;
 	
-	void TransformRayToCameraTransform(Ray& ray);
+	Ray TransformRayToCameraTransform(const Ray& ray);
 	void CalculateTotalPixelIrradiance(HitRecord& hit);
 	float LambertCos(const Elite::FVector3& normal, const Elite::FVector3& direction) const;
 	bool SkipLightCalculation(const Elite::FVector3& lightDirection, HitRecord& hit) const;
-
 };

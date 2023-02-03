@@ -24,6 +24,7 @@ Camera::Camera(Elite::FVector3 cameraPosition, float s, float fieldOfView)
 	, m_ShadowsEnabled{ true }
 	, m_RenderMode{ RenderMode::all }
 	, m_RotateSpeed{.1f}
+	, m_NormalizedRays{}
 {
 	
 }
@@ -33,16 +34,36 @@ Camera::Camera()
 {
 }
 
+void Camera::PreComputeRays(int screenWidth, int screenHeight) {
+
+	// Calculate normalized ray per pixel
+
+	m_NormalizedRays.reserve(screenWidth * screenHeight);
+
+	for (size_t r = 0; r < screenHeight; r++)
+	{
+		for (size_t c = 0; c < screenWidth; c++)
+		{
+			Elite::FVector3 worldSpaceOrigin{ ScreenToWorldSpaceWithCameraOffset(c, r, screenWidth, screenHeight) };
+			Ray ray{ Elite::FPoint3{0.f, 0.f, 0.f}, worldSpaceOrigin };
+			ray.NormalizeRay();
+			//m_NormalizedRays[(screenWidth * r) + c] = ray;
+			m_NormalizedRays.emplace_back(ray);
+			
+		}
+	}
+}
+
 void Camera::CalculatePixelColor(int c, int r, int width, int height, HitRecord& hit) {
 
 	if (!m_SceneToRender)
 		UpdateSceneGraphReference();
 
-	Elite::FVector3 worldSpaceOrigin{ ScreenToWorldSpaceWithCameraOffset(c, r, width, height) };
-	Ray ray{ m_CameraPosition , worldSpaceOrigin };
-	ray.NormalizeRay();
+	//Elite::FVector3 worldSpaceOrigin{ ScreenToWorldSpaceWithCameraOffset(c, r, width, height) };
+	//Ray ray{ m_CameraPosition , worldSpaceOrigin };
+	//ray.NormalizeRay();
 
-	TransformRayToCameraTransform(ray);
+	Ray ray = TransformRayToCameraTransform(m_NormalizedRays[(width * r) + c]);
 
 	std::vector<Geometry*> sceneGeo = m_SceneToRender->GetSceneGeometry();
 
@@ -140,14 +161,18 @@ Elite::FVector3 Camera::ScreenToWorldSpaceWithCameraOffset(int c, int r, int wid
 	return { xss, yss, -m_S };
 }
 
-void Camera::TransformRayToCameraTransform(Ray& ray)
+Ray Camera::TransformRayToCameraTransform(const Ray& ray)
 {
+	Ray transformedRay{ ray };
+	transformedRay.SetOrigin(m_CameraPosition);
 	Elite::FMatrix4 T = Elite::MakeTranslation(Elite::FVector3{ m_CameraPosition });
 	Elite::FMatrix4 R = Elite::MakeRotationZYX(m_Pitch, m_Yaw, 0.0f);
 
-	Elite::FVector4 directionVector{ ray.GetDirection() };
-	directionVector = T * R * directionVector;
-	ray.SetDirection(Elite::FVector3{directionVector});
+	Elite::FVector4 directionVector{ transformedRay.GetDirection() };
+	//directionVector = (T * (R * directionVector));
+	directionVector = (R * directionVector);
+	transformedRay.SetDirection(Elite::FVector3{directionVector});
+	return transformedRay;
 }
 
 Elite::FPoint3 Camera::GetCameraPosition() const {
@@ -236,7 +261,7 @@ void Camera::MoveForward(float deltaT) {
 	Elite::FPoint3 origin{ 0.0f, 0.0f, 0.0f };
 	Elite::FVector3 direction{ 0.0f, 0.0f, 1.0f };
 	Ray forwardRay{ m_CameraPosition, direction };
-	TransformRayToCameraTransform(forwardRay);
+	forwardRay = TransformRayToCameraTransform(forwardRay);
 
 	m_CameraPosition -= forwardRay.GetDirection() * m_MovementSpeed * deltaT;
 
@@ -246,7 +271,7 @@ void Camera::MoveLeft(float deltaT, float amount) {
 	Elite::FPoint3 origin{ 0.0f, 0.0f, 0.0f };
 	Elite::FVector3 direction{ 1.0f, 0.0f, 0.0f };
 	Ray forwardRay{ m_CameraPosition, direction };
-	TransformRayToCameraTransform(forwardRay);
+	forwardRay = TransformRayToCameraTransform(forwardRay);
 
 	m_CameraPosition -= forwardRay.GetDirection() * m_MovementSpeed * deltaT * amount;
 }
@@ -255,7 +280,7 @@ void Camera::MoveRight(float deltaT, float amount) {
 	Elite::FPoint3 origin{ 0.0f, 0.0f, 0.0f };
 	Elite::FVector3 direction{ 1.0f, 0.0f, 0.0f };
 	Ray forwardRay{ m_CameraPosition, direction };
-	TransformRayToCameraTransform(forwardRay);
+	forwardRay = TransformRayToCameraTransform(forwardRay);
 
 	m_CameraPosition += forwardRay.GetDirection() * m_MovementSpeed * deltaT * amount;
 }
@@ -264,7 +289,7 @@ void Camera::MoveBackwards(float deltaT) {
 	Elite::FPoint3 origin{ 0.0f, 0.0f, 0.0f };
 	Elite::FVector3 direction{ 0.0f, 0.0f, 1.0f };
 	Ray forwardRay{ m_CameraPosition, direction };
-	TransformRayToCameraTransform(forwardRay);
+	forwardRay = TransformRayToCameraTransform(forwardRay);
 
 	m_CameraPosition += forwardRay.GetDirection() * m_MovementSpeed * deltaT;
 }
