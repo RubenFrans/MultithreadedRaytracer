@@ -51,7 +51,7 @@ Elite::Renderer::Renderer(SDL_Window* pWindow)
 	m_RenderBatchRowAmount = m_Height / m_AmountOfCores;
 	m_RenderRowstep = m_RenderBatchRowAmount * m_AmountOfCores;
 
-	m_EndableMultithreadedRendering = false;
+	m_EndableMultithreadedRendering = true;
 	InitializeRenderJobs();
 	PrintControlInfo();
 }
