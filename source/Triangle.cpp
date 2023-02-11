@@ -10,10 +10,20 @@ Triangle::Triangle(const Elite::RGBColor& color, Material* material, const Elite
 	, m_V0 { v0 + position }
 	, m_V1 { v1 + position}
 	, m_V2 { v2 + position }
+	, m_Normal{}
 	, m_Cullmode{ cullmode }
 	, m_RotationSpeed{ 3.2f }
 	, m_CurrentAngleDegrees{ 0.0f }
 {
+	PreCalculateNormal();
+}
+
+void Triangle::PreCalculateNormal()
+{
+	Elite::FVector3 ab{ m_V1 - m_V0 };
+	Elite::FVector3 ac{ m_V2 - m_V0 };
+	m_Normal = Elite::Cross(ab, ac);
+	Elite::Normalize(m_Normal);
 }
 
 bool Triangle::Hit(const Ray& ray, HitRecord& hitrecord) const
@@ -21,20 +31,20 @@ bool Triangle::Hit(const Ray& ray, HitRecord& hitrecord) const
 
 	Elite::FVector3 ab{ m_V1 - m_V0 };
 	Elite::FVector3 ac{ m_V2 - m_V0 };
-	Elite::FVector3 normal{Elite::Cross(ab, ac) };
-	Elite::Normalize(normal);
+	//Elite::FVector3 normal{Elite::Cross(ab, ac) };
+	//Elite::Normalize(normal);
 
 	Elite::FVector3 v = Elite::GetNormalized(ray.GetDirection());
-	if (Elite::Dot(normal, v) == 0)
+	if (Elite::Dot(m_Normal, v) == 0)
 		return false;
 
 	if (m_Cullmode == CullMode::backface) {
-		if (Elite::Dot(normal, v) > 0) {
+		if (Elite::Dot(m_Normal, v) > 0) {
 			return false;
 		}
 	}
 	else if (m_Cullmode == CullMode::frontface) {
-		if (Elite::Dot(normal, v) < 0) {
+		if (Elite::Dot(m_Normal, v) < 0) {
 			return false;
 		}
 	}
@@ -43,7 +53,7 @@ bool Triangle::Hit(const Ray& ray, HitRecord& hitrecord) const
 	Elite::FPoint3 center{ (m_V0.x + m_V1.x + m_V2.x) / 3, (m_V0.y + m_V1.y + m_V2.y) / 3, (m_V0.z + m_V1.z + m_V2.z) / 3 };
 	Elite::FVector3 L{ center - ray.GetOrigin()};
 
-	float t{ Elite::Dot(L, normal) / Elite::Dot(v, normal) };
+	float t{ Elite::Dot(L, m_Normal) / Elite::Dot(v, m_Normal) };
 
 	if (t < ray.GetTMin() || t > ray.GetTMax() || t > hitrecord.m_TValue)
 		return false;
@@ -59,7 +69,7 @@ bool Triangle::Hit(const Ray& ray, HitRecord& hitrecord) const
 	if (w1 >= 0 && w2 >= 0 && (w1 + w2) <= 1) {
 		hitrecord.m_Color = m_Color;
 		hitrecord.m_HitPoint = { ray.GetOrigin() + Elite::GetNormalized(ray.GetDirection()) * t };
-		hitrecord.m_HitPointNormal = normal;
+		hitrecord.m_HitPointNormal = m_Normal;
 		hitrecord.m_TValue = t;
 		hitrecord.m_pMaterial = m_pMaterial;
 		return true;
@@ -119,4 +129,5 @@ void Triangle::Rotate(float deltaT) {
 	m_V2.y = v2.y;
 	m_V2.z = v2.z;
 
+	m_Normal = (R * Elite::FVector4{ m_Normal }).xyz;
 }

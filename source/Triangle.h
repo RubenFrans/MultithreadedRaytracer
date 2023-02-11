@@ -21,10 +21,14 @@ public:
 	void RotateCosine(float totalTime, float deltaT);
 	void Rotate(float deltaT);
 private:
+
+	void PreCalculateNormal();
+
 	Elite::FVector3 m_Position;
 	Elite::FPoint3 m_V0;
 	Elite::FPoint3 m_V1;
 	Elite::FPoint3 m_V2;
+	Elite::FVector3 m_Normal;
 	CullMode m_Cullmode;
 	float m_RotationSpeed;
 	float m_CurrentAngleDegrees;

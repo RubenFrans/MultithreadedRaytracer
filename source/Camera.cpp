@@ -47,7 +47,6 @@ void Camera::PreComputeRays(int screenWidth, int screenHeight) {
 			Elite::FVector3 worldSpaceOrigin{ ScreenToWorldSpaceWithCameraOffset(c, r, screenWidth, screenHeight) };
 			Ray ray{ Elite::FPoint3{0.f, 0.f, 0.f}, worldSpaceOrigin };
 			ray.NormalizeRay();
-			//m_NormalizedRays[(screenWidth * r) + c] = ray;
 			m_NormalizedRays.emplace_back(ray);
 			
 		}
@@ -58,10 +57,6 @@ void Camera::CalculatePixelColor(int c, int r, int width, int height, HitRecord&
 
 	if (!m_SceneToRender)
 		UpdateSceneGraphReference();
-
-	//Elite::FVector3 worldSpaceOrigin{ ScreenToWorldSpaceWithCameraOffset(c, r, width, height) };
-	//Ray ray{ m_CameraPosition , worldSpaceOrigin };
-	//ray.NormalizeRay();
 
 	Ray ray = TransformRayToCameraTransform(m_NormalizedRays[(width * r) + c]);
 
@@ -165,11 +160,8 @@ Ray Camera::TransformRayToCameraTransform(const Ray& ray)
 {
 	Ray transformedRay{ ray };
 	transformedRay.SetOrigin(m_CameraPosition);
-	Elite::FMatrix4 T = Elite::MakeTranslation(Elite::FVector3{ m_CameraPosition });
 	Elite::FMatrix4 R = Elite::MakeRotationZYX(m_Pitch, m_Yaw, 0.0f);
-
 	Elite::FVector4 directionVector{ transformedRay.GetDirection() };
-	//directionVector = (T * (R * directionVector));
 	directionVector = (R * directionVector);
 	transformedRay.SetDirection(Elite::FVector3{directionVector});
 	return transformedRay;
