@@ -35,12 +35,13 @@ void TriangleMesh::GenerateBoundingBox()
         min.y = std::min(min.y, std::min(triangle->GetV0().y, std::min(triangle->GetV1().y, triangle->GetV2().y)));
         min.z = std::min(min.z, std::min(triangle->GetV0().z, std::min(triangle->GetV1().z, triangle->GetV2().z)));
 
-        max.x = std::max(min.x, std::max(triangle->GetV0().x, std::min(triangle->GetV1().x, triangle->GetV2().x)));
-        max.y = std::max(min.y, std::max(triangle->GetV0().y, std::min(triangle->GetV1().y, triangle->GetV2().y)));
-        max.z = std::max(min.z, std::max(triangle->GetV0().z, std::min(triangle->GetV1().z, triangle->GetV2().z)));
+        max.x = std::max(max.x, std::max(triangle->GetV0().x, std::max(triangle->GetV1().x, triangle->GetV2().x)));
+        max.y = std::max(max.y, std::max(triangle->GetV0().y, std::max(triangle->GetV1().y, triangle->GetV2().y)));
+        max.z = std::max(max.z, std::max(triangle->GetV0().z, std::max(triangle->GetV1().z, triangle->GetV2().z)));
+
     }
 
-    m_BoundingBox = AABB{ min * 1.5, max * 1.5};
+    m_BoundingBox = AABB{ min, max };
 }
 
 bool TriangleMesh::Hit(const Ray& ray, HitRecord& hit) const
