@@ -2,6 +2,7 @@
 #include "Ray.h"
 #include "HitRecord.h"
 #include "Material.h"
+
 Plane::Plane(Elite::FPoint3 planeOrigin, Elite::FVector3 planeNormal, Elite::RGBColor color, Material* material)
     : Geometry{ color, material }
 {
@@ -22,9 +23,7 @@ bool Plane::Hit(const Ray& ray, HitRecord& hitRecord) const
             hitRecord.m_TValue = t;
             hitRecord.m_pMaterial = m_pMaterial;
         }
-
         return true;
     }
-
     return false;
 }

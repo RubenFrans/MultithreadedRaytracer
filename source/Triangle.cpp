@@ -2,7 +2,7 @@
 #include "Ray.h"
 #include "HitRecord.h"
 #include "EMath.h"
-
+#include <algorithm>
 
 Triangle::Triangle(const Elite::RGBColor& color, Material* material, const Elite::FVector3& position, const Elite::FPoint3& v0, const Elite::FPoint3& v1,const  Elite::FPoint3& v2, CullMode cullmode)
 	: Geometry{ color, material }
@@ -14,8 +14,10 @@ Triangle::Triangle(const Elite::RGBColor& color, Material* material, const Elite
 	, m_Cullmode{ cullmode }
 	, m_RotationSpeed{ 3.2f }
 	, m_CurrentAngleDegrees{ 0.0f }
+	, m_BoundingBox{}
 {
 	PreCalculateNormal();
+	GenerateBoundingBox();
 }
 
 void Triangle::PreCalculateNormal()
@@ -26,13 +28,30 @@ void Triangle::PreCalculateNormal()
 	Elite::Normalize(m_Normal);
 }
 
+void Triangle::GenerateBoundingBox()
+{
+	Elite::FVector3 min, max;
+	min.x = std::min(m_V0.x, std::min(m_V1.x, m_V2.x));
+	min.y = std::min(m_V0.y, std::min(m_V1.y, m_V2.y));
+	min.z = std::min(m_V0.z, std::min(m_V1.z, m_V2.z));
+
+	max.x = std::max(m_V0.x, std::max(m_V1.x, m_V2.x));
+	max.y = std::max(m_V0.y, std::max(m_V1.y, m_V2.y));
+	max.z = std::max(m_V0.z, std::max(m_V1.z, m_V2.z));
+
+	m_BoundingBox = AABB{ min, max };
+}
+
 bool Triangle::Hit(const Ray& ray, HitRecord& hitrecord) const
 {
 
+	if (!m_BoundingBox.Intersect(ray))
+	{
+		return false;
+	}
+
 	Elite::FVector3 ab{ m_V1 - m_V0 };
 	Elite::FVector3 ac{ m_V2 - m_V0 };
-	//Elite::FVector3 normal{Elite::Cross(ab, ac) };
-	//Elite::Normalize(normal);
 
 	Elite::FVector3 v = Elite::GetNormalized(ray.GetDirection());
 	if (Elite::Dot(m_Normal, v) == 0)
@@ -130,4 +149,22 @@ void Triangle::Rotate(float deltaT) {
 	m_V2.z = v2.z;
 
 	m_Normal = (R * Elite::FVector4{ m_Normal }).xyz;
+
+	GenerateBoundingBox();
+
+}
+
+const Elite::FPoint3& Triangle::GetV0() const
+{
+	return m_V0;
+}
+
+const Elite::FPoint3& Triangle::GetV1() const
+{
+	return m_V1;
+}
+
+const Elite::FPoint3& Triangle::GetV2() const
+{
+	return m_V2;
 }

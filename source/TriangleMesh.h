@@ -2,6 +2,7 @@
 #include "Geometry.h"
 #include "EMath.h"
 #include <vector>
+#include "AABB.h"
 
 class Triangle;
 
@@ -18,10 +19,15 @@ public:
     virtual bool Hit(const Ray& ray, HitRecord& hit) const override;
     void Rotate(float deltaT);
 private:
+
+    void AssembleTriangles();
+    void GenerateBoundingBox();
+
     Elite::FVector3 m_Position;
     std::vector<int> m_IdList;
     std::vector<Elite::FPoint3> m_VertexBuffer;
     std::vector<Triangle*> m_Triangles;
-    void AssembleTriangles();
+
+    AABB m_BoundingBox;
 };
 

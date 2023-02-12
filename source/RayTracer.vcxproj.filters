@@ -157,6 +157,10 @@
     <ClInclude Include="MeshLoader.h">
       <Filter>Objects\Geometry\Mesh</Filter>
     </ClInclude>
+    <ClInclude Include="Cube.h">
+      <Filter>Objects\Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="AABB.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ERenderer.cpp">
@@ -228,6 +232,12 @@
     </ClCompile>
     <ClCompile Include="MeshLoader.cpp">
       <Filter>Objects\Geometry\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="Cube.cpp">
+      <Filter>Objects\Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="AABB.cpp">
+      <Filter>Math</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -24,6 +24,7 @@
 #include "Triangle.h"
 #include "TriangleMesh.h"
 #include "MeshLoader.h"
+#include "Cube.h"
 
 Elite::Renderer::Renderer(SDL_Window* pWindow)
 {
@@ -500,4 +501,8 @@ void Elite::Renderer::InitializeSphereScene()
 	SceneGraphLocator::GetSceneGraph()->AddLightToScene(new PointLight{ lightPos, lightColor, 50.0f });
 	SceneGraphLocator::GetSceneGraph()->AddLightToScene(new PointLight{ lightPos2, lightColor2, 70.0f });
 	SceneGraphLocator::GetSceneGraph()->AddLightToScene(new PointLight{ Elite::FPoint3{2.5f, 2.5f, 5.f}, Elite::RGBColor{.34f, .47f, .68f}, 50.0f });
+
+
+	SceneGraphLocator::GetSceneGraph()->AddObjectToScene(new Cube{ roughMetalColor, pbr_SmoothMetal, Elite::FVector3{2.f, 2.f, 2.f}, Elite::FVector3{4.f, 4.f, 4.f} });
+
 }

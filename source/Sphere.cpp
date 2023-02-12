@@ -2,15 +2,41 @@
 #include "HitRecord.h"
 #include "Ray.h"
 #include "Material.h"
+
 Sphere::Sphere(float radius, Elite::FPoint3 origin, Elite::RGBColor color, Material* material)
 	: Geometry{ color, material }
+	, m_Radius{ radius }
+	, m_Origin{ origin }
+	, m_BoundingBox{}
 {
-		m_Radius = radius;
-		m_Origin = origin;
+		//m_Radius = radius;
+		//m_Origin = origin;
+		GenerateBoundingBox();
+}
+
+void Sphere::GenerateBoundingBox()
+{
+	Elite::FVector3 min = Elite::FVector3{ m_Origin };
+	Elite::FVector3 max = Elite::FVector3{ m_Origin };
+
+	min.x -= m_Radius;
+	min.y -= m_Radius;
+	min.z -= m_Radius;
+
+	max.x += m_Radius;
+	max.y += m_Radius;
+	max.z += m_Radius;
+
+	m_BoundingBox = AABB{ min, max };
 }
 
 bool Sphere::Hit(const Ray& ray, HitRecord& hitRecord) const
 {
+	if (!m_BoundingBox.Intersect(ray)) 
+	{
+		return false;
+	}
+
 	float a = Elite::Dot(ray.GetDirection(), ray.GetDirection());
 	float b = Elite::Dot(2.f * ray.GetDirection(), ray.GetOrigin() - m_Origin);
 	float c = Elite::Dot(ray.GetOrigin() - m_Origin, ray.GetOrigin() - m_Origin) - m_Radius * m_Radius;
@@ -33,3 +59,5 @@ bool Sphere::Hit(const Ray& ray, HitRecord& hitRecord) const
 
 	return false;
 }
+
+

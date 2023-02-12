@@ -1,7 +1,7 @@
 #pragma once
 #include "Geometry.h"
 #include "EMath.h"
-
+#include "AABB.h"
 
 enum  class CullMode {
 	backface, frontface, none
@@ -20,9 +20,15 @@ public:
 	virtual bool Hit(const Ray& ray, HitRecord& hitrecord) const override;
 	void RotateCosine(float totalTime, float deltaT);
 	void Rotate(float deltaT);
+
+	const Elite::FPoint3& GetV0() const;
+	const Elite::FPoint3& GetV1() const;
+	const Elite::FPoint3& GetV2() const;
+
 private:
 
 	void PreCalculateNormal();
+	void GenerateBoundingBox();
 
 	Elite::FVector3 m_Position;
 	Elite::FPoint3 m_V0;
@@ -32,5 +38,7 @@ private:
 	CullMode m_Cullmode;
 	float m_RotationSpeed;
 	float m_CurrentAngleDegrees;
+
+	AABB m_BoundingBox;
 };
 
